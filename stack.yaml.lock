@@ -5,28 +5,6 @@
 
 packages:
 - completed:
-    size: 5552557
-    url: https://github.com/reanimate/reanimate/archive/ff880e7296bd371d8a950438fefefab587d0230e.tar.gz
-    name: reanimate
-    version: 0.5.0.1
-    sha256: 21bedd6a792ad07e939b8d2135c1ac8a76ee7c78056b7336508596bbf56ccf47
-    pantry-tree:
-      size: 39531
-      sha256: 9d3a81f7ede7917c447f4c6314085978bfd98d11461f26680ccf67c13000d42f
-  original:
-    url: https://github.com/reanimate/reanimate/archive/ff880e7296bd371d8a950438fefefab587d0230e.tar.gz
-- completed:
-    size: 43603
-    url: https://github.com/reanimate/reanimate-svg/archive/7c8330e23c3fe9d16c30928e3a4fefdf96f65cde.tar.gz
-    name: reanimate-svg
-    version: 0.11.0.0
-    sha256: eb92c95f1f6af9bb20cfc610d26c3ae87aa9d096644e23aa6aef4331cb63e240
-    pantry-tree:
-      size: 1860
-      sha256: 46274ad4e2e58b15ba1249069cb6eacbf668642489b72ffdd85f2fd763ef2c12
-  original:
-    url: https://github.com/reanimate/reanimate-svg/archive/7c8330e23c3fe9d16c30928e3a4fefdf96f65cde.tar.gz
-- completed:
     hackage: hgeometry-0.11.0.0@sha256:09ead201a6ac3492c0be8dda5a6b32792b9ae87cab730b8362d46ee8d5c2acb4,11714
     pantry-tree:
       size: 10298
@@ -40,6 +18,20 @@ packages:
       sha256: 917d3000636f5f5b5b693084228def875d3c5f89e592b4d38ef8f9051c1f7fbc
   original:
     hackage: hgeometry-combinatorial-0.11.0.0@sha256:03176f235a1c49a415fe1266274dafca84deb917cbcbf9a654452686b4cd2bfe,8286
+- completed:
+    hackage: reanimate-1.0.0.0@sha256:73d25c592d8b544767bce289fedbf11c9fe3f9bf53d37799064c363ebb2e7f49,5989
+    pantry-tree:
+      size: 30075
+      sha256: 21a7d0e088d52f3e4c293784ab0babc7ee68891bd7713b4ccaac6fc3f7f79eb6
+  original:
+    hackage: reanimate-1.0.0.0@sha256:73d25c592d8b544767bce289fedbf11c9fe3f9bf53d37799064c363ebb2e7f49,5989
+- completed:
+    hackage: reanimate-svg-0.11.0.0@sha256:17b1a884a4428854608dd64c0d1e15d1aca05c8bd84781e360a6793b58461dd0,2322
+    pantry-tree:
+      size: 1476
+      sha256: 9a54665ab638d47e6ed5a72ca43906b2a1282fcf87a2e8b5ffc4470bbb82ab4f
+  original:
+    hackage: reanimate-svg-0.11.0.0@sha256:17b1a884a4428854608dd64c0d1e15d1aca05c8bd84781e360a6793b58461dd0,2322
 - completed:
     hackage: vinyl-0.13.0@sha256:0f247cd3f8682b30881a07de18e6fec52d540646fbcb328420049cc8d63cd407,3724
     pantry-tree:

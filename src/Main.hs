@@ -25,8 +25,8 @@ main = do
   ts <- fakeTranscript <$> Text.readFile "/home/jhrcek/Devel/github.com/jhrcek/reanimate-play/transcript.txt"
   reanimate $
     addStatic (mkBackground "white") $
-      sceneAnimation $ do
-        fork $ annotateWithTranscript ts
+      scene $ do
+        --fork $ annotateWithTranscript ts
 
         circleDrawProgress <- newVar 0
         diameterDrawProgress <- newVar 0
@@ -37,7 +37,7 @@ main = do
         cTheta <- newVar $ 2 * pi / 3
 
         newSprite_ $
-          fmap triangle $
+          fmap thales $
             SceneVars
               <$> unVar circleDrawProgress
               <*> unVar diameterDrawProgress
@@ -47,22 +47,22 @@ main = do
               <*> unVar endpointsDrawProgress
               <*> unVar cTheta
 
-        waitUntil $ wordStart $ findWord ts ["circle"] "circle"
+        -- waitUntil $ wordStart $ findWord ts ["circle"] "circle"
         tweenVar circleDrawProgress 2 $ \val -> fromToS val 1
-
-        waitUntil $ wordStart $ findWord ts ["circle"] "center"
+        wait 1
+        --waitUntil $ wordStart $ findWord ts ["circle"] "center"
         -- TODO some signal to dedupe the "highlight"
         tweenVar centerDrawProgress 0.5 $ \val -> fromToS val 3
         tweenVar centerDrawProgress 0.5 $ \val -> fromToS val 1
-
-        waitUntil $ wordStart $ findWord ts ["diameter"] "diameter"
+        wait 1
+        --waitUntil $ wordStart $ findWord ts ["diameter"] "diameter"
         tweenVar diameterDrawProgress 1 $ \val -> fromToS val 1
-
-        waitUntil $ wordStart $ findWord ts ["diameter"] "endpoints"
+        wait 1
+        --waitUntil $ wordStart $ findWord ts ["diameter"] "endpoints"
         tweenVar endpointsDrawProgress 0.5 $ \val -> fromToS val 3
         tweenVar endpointsDrawProgress 0.5 $ \val -> fromToS val 1
-
-        waitUntil $ wordStart $ findWord ts ["point"] "point"
+        wait 1
+        --waitUntil $ wordStart $ findWord ts ["point"] "point"
         tweenVar triangleDrawProgress 1 $ \val -> fromToS val 1
 
         wait 1
@@ -77,8 +77,8 @@ main = do
         tweenVar radiusDrawProgress 1 $ \val -> fromToS val 1
         wait 5
 
-triangle :: SceneVars -> SVG
-triangle SceneVars {..} =
+thales :: SceneVars -> SVG
+thales SceneVars {..} =
   let cx = 4 * cos cTheta
       cy = 4 * sin cTheta
    in withStrokeColor "black" $
@@ -95,33 +95,37 @@ triangle SceneVars {..} =
                 partial circleDrawProgress $ mkCircle 4,
                 partial diameterDrawProgress $ mkLine (-4, 0) (4, 0),
                 -- Center
-                mkCircle (centerDrawProgress * 0.05),
-                drawIf (centerDrawProgress > 0.99) $
-                  withFillOpacity 1 $
-                    translate 0 -0.4 $ textLabel "O",
+                withFillOpacity 1 $
+                  mkGroup
+                    [ mkCircle (centerDrawProgress * 0.05),
+                      drawIf (centerDrawProgress > 0.99) $
+                        translate 0 -0.4 $ textLabel "O"
+                    ],
                 -- Endpoints
-                mkGroup
-                  [ translate -4.0 0 $ mkCircle (endpointsDrawProgress * 0.05),
-                    translate 4.0 0 $ mkCircle (endpointsDrawProgress * 0.05)
-                  ],
-                drawIf (endpointsDrawProgress > 0.99) $
-                  withFillOpacity 1 $
-                    mkGroup
-                      [ translate -4.2 0 $ textLabel "A",
-                        translate 4.2 0 $ textLabel "B"
-                      ],
+                withFillOpacity 1 $
+                  mkGroup
+                    [ translate -4.0 0 $ mkCircle (endpointsDrawProgress * 0.05),
+                      translate 4.0 0 $ mkCircle (endpointsDrawProgress * 0.05),
+                      drawIf (endpointsDrawProgress > 0.99) $
+                        mkGroup
+                          [ translate -4.2 0 $ textLabel "A",
+                            translate 4.2 0 $ textLabel "B"
+                          ]
+                    ],
                 -- Triangle
                 partial triangleDrawProgress $
                   mkLinePath [(-4, 0), (cx, cy), (4, 0)]
                     & strokeLineJoin .~ pure JoinBevel,
                 partial radiusDrawProgress $ mkLine (0, 0) (cx, cy),
+                -- angles
                 drawIf (triangleDrawProgress > 0.99) $
                   withClipPathRef (Ref "triangle-mask") $
                     mkGroup
                       [ translate cx cy $ mkCircle 0.5,
                         translate 4 0 $ mkCircle 0.5,
                         translate -4 0 $ mkCircle 0.5
-                      ]
+                      ],
+                withFillOpacity 1 $ translate 4.2 0 $ textLabel2 "$ \\alpha \\beta $"
               ]
 
 partial :: Double -> SVG -> Tree
@@ -129,6 +133,9 @@ partial progress = partialSvg progress . pathify
 
 textLabel :: Text.Text -> Tree
 textLabel = scale 0.2 . mkText
+
+textLabel2 :: Text.Text -> Tree
+textLabel2 = scale 0.3 . latex
 
 drawIf :: Bool -> SVG -> SVG
 drawIf cond svg = if cond then svg else None

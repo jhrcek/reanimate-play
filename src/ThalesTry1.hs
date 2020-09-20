@@ -22,7 +22,7 @@ main :: IO ()
 main =
   reanimate $
     addStatic (mkBackground "white") $
-      sceneAnimation $ do
+      scene $ do
         triangleDrawProgress <- newVar 0
         circleDrawProgress <- newVar 0
         xLeg <- newVar 1

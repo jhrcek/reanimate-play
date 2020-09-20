@@ -1,18 +1,18 @@
-[circle]
-Let's draw a circle.
+[title]
 
-A circle is a shape consisting of all points in a plane that are a given distance from a given point, the center
+Thales's Theorem
 
-[diameter]
-Now let's draw a diameter.
+[statement]
 
-A diameter of a circle is any straight line segment that passes through the center of the circle and whose endpoints lie on the circle.
-We mark its endpoints with A and B.
+In geometry, Thale's theorem states that if A, B and C are distinct points on a circle, where the line AC is a diameter, then the angle <ABC is a right angle.
 
-[point]
+[step-by-step]
 
-Now pick a point C anywhere on the circle, different from A and B.
+Let's go through the statement step by step to get a better understanding of what it says.
 
-[triangle]
+TODO definition of a circle
 
-Let's construct a triangle using the diameter as one side and going through C.
+TODO definition of a diameter
+
+[proof]
+
