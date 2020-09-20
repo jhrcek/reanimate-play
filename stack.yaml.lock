@@ -3,10 +3,53 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    size: 5552557
+    url: https://github.com/reanimate/reanimate/archive/ff880e7296bd371d8a950438fefefab587d0230e.tar.gz
+    name: reanimate
+    version: 0.5.0.1
+    sha256: 21bedd6a792ad07e939b8d2135c1ac8a76ee7c78056b7336508596bbf56ccf47
+    pantry-tree:
+      size: 39531
+      sha256: 9d3a81f7ede7917c447f4c6314085978bfd98d11461f26680ccf67c13000d42f
+  original:
+    url: https://github.com/reanimate/reanimate/archive/ff880e7296bd371d8a950438fefefab587d0230e.tar.gz
+- completed:
+    size: 43603
+    url: https://github.com/reanimate/reanimate-svg/archive/7c8330e23c3fe9d16c30928e3a4fefdf96f65cde.tar.gz
+    name: reanimate-svg
+    version: 0.11.0.0
+    sha256: eb92c95f1f6af9bb20cfc610d26c3ae87aa9d096644e23aa6aef4331cb63e240
+    pantry-tree:
+      size: 1860
+      sha256: 46274ad4e2e58b15ba1249069cb6eacbf668642489b72ffdd85f2fd763ef2c12
+  original:
+    url: https://github.com/reanimate/reanimate-svg/archive/7c8330e23c3fe9d16c30928e3a4fefdf96f65cde.tar.gz
+- completed:
+    hackage: hgeometry-0.11.0.0@sha256:09ead201a6ac3492c0be8dda5a6b32792b9ae87cab730b8362d46ee8d5c2acb4,11714
+    pantry-tree:
+      size: 10298
+      sha256: b5665fbc036aa985218b44d8036dd0cfde388d26a236dc51acf6bf266f98609c
+  original:
+    hackage: hgeometry-0.11.0.0@sha256:09ead201a6ac3492c0be8dda5a6b32792b9ae87cab730b8362d46ee8d5c2acb4,11714
+- completed:
+    hackage: hgeometry-combinatorial-0.11.0.0@sha256:03176f235a1c49a415fe1266274dafca84deb917cbcbf9a654452686b4cd2bfe,8286
+    pantry-tree:
+      size: 3959
+      sha256: 917d3000636f5f5b5b693084228def875d3c5f89e592b4d38ef8f9051c1f7fbc
+  original:
+    hackage: hgeometry-combinatorial-0.11.0.0@sha256:03176f235a1c49a415fe1266274dafca84deb917cbcbf9a654452686b4cd2bfe,8286
+- completed:
+    hackage: vinyl-0.13.0@sha256:0f247cd3f8682b30881a07de18e6fec52d540646fbcb328420049cc8d63cd407,3724
+    pantry-tree:
+      size: 1857
+      sha256: 860fb95820b595161cdbdec5f376100ebae2d14e5ef0dbe311546202f7525d01
+  original:
+    hackage: vinyl-0.13.0@sha256:0f247cd3f8682b30881a07de18e6fec52d540646fbcb328420049cc8d63cd407,3724
 snapshots:
 - completed:
-    size: 532377
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/12.yaml
-    sha256: f914cfa23fef85bdf895e300a8234d9d0edc2dbec67f4bc9c53f85867c50eab6
-  original: lts-16.12
+    size: 532380
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/16/15.yaml
+    sha256: 3b5f2a699aa5ed3abbc30410062bf743926f0868ce3eeb5655370c6c6cc1a9f4
+  original: lts-16.15

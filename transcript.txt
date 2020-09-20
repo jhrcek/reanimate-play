@@ -1,0 +1,18 @@
+[circle]
+Let's draw a circle.
+
+A circle is a shape consisting of all points in a plane that are a given distance from a given point, the center
+
+[diameter]
+Now let's draw a diameter.
+
+A diameter of a circle is any straight line segment that passes through the center of the circle and whose endpoints lie on the circle.
+We mark its endpoints with A and B.
+
+[point]
+
+Now pick a point C anywhere on the circle, different from A and B.
+
+[triangle]
+
+Let's construct a triangle using the diameter as one side and going through C.

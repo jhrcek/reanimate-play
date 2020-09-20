@@ -18,5 +18,8 @@ executable reanimate-play
     build-depends:
         base >=4.7 && <5,
         reanimate,
+        reanimate-svg,
         text,
+        lens,
+        linear,
         JuicyPixels
