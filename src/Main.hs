@@ -4,28 +4,26 @@
 {-# LANGUAGE NegativeLiterals #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Main (main) where
 
-import Control.Applicative
-import Control.Lens (set, (&), (.~))
+import Control.Lens ((&), (.~))
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import Graphics.SvgTree --(LineJoin (JoinBevel), strokeLineJoin, pattern None)
-import Graphics.SvgTree.Types (fontFamily)
-import Linear.V2
 import Reanimate
-import Reanimate.Builtin.Documentation
-import Reanimate.Math.Common (distance')
-import Reanimate.Transition
-import Reanimate.Voice
+import Reanimate.Scene
+import Reanimate.Voice (fakeTranscript)
 
 main :: IO ()
 main = do
   ts <- fakeTranscript <$> Text.readFile "/home/jhrcek/Devel/github.com/jhrcek/reanimate-play/transcript.txt"
   reanimate $
-    addStatic (mkBackground "white") $
+    addStatic (mkBackground "black") $
       scene $ do
+        titleScene
+
         --fork $ annotateWithTranscript ts
 
         circleDrawProgress <- newVar 0
@@ -77,11 +75,25 @@ main = do
         tweenVar radiusDrawProgress 1 $ \val -> fromToS val 1
         wait 5
 
+titleScene :: Scene s ()
+titleScene = do
+  title <-
+    oNew $
+      withStrokeColor "white" $
+        withFillColor "whiteu" $
+          withStrokeWidth 0.1 $
+            scale 1.5 $
+              center $ latex "Thales's theorem"
+  oShowWith title oDraw
+  wait 1
+  oHideWith title oFadeOut
+  wait 1
+
 thales :: SceneVars -> SVG
 thales SceneVars {..} =
   let cx = 4 * cos cTheta
       cy = 4 * sin cTheta
-   in withStrokeColor "black" $
+   in withStrokeColor "white" $
         withFillOpacity 0 $
           withStrokeWidth (defaultStrokeWidth * 0.4) $
             mkGroup
@@ -94,24 +106,6 @@ thales SceneVars {..} =
                       ],
                 partial circleDrawProgress $ mkCircle 4,
                 partial diameterDrawProgress $ mkLine (-4, 0) (4, 0),
-                -- Center
-                withFillOpacity 1 $
-                  mkGroup
-                    [ mkCircle (centerDrawProgress * 0.05),
-                      drawIf (centerDrawProgress > 0.99) $
-                        translate 0 -0.4 $ textLabel "O"
-                    ],
-                -- Endpoints
-                withFillOpacity 1 $
-                  mkGroup
-                    [ translate -4.0 0 $ mkCircle (endpointsDrawProgress * 0.05),
-                      translate 4.0 0 $ mkCircle (endpointsDrawProgress * 0.05),
-                      drawIf (endpointsDrawProgress > 0.99) $
-                        mkGroup
-                          [ translate -4.2 0 $ textLabel "A",
-                            translate 4.2 0 $ textLabel "B"
-                          ]
-                    ],
                 -- Triangle
                 partial triangleDrawProgress $
                   mkLinePath [(-4, 0), (cx, cy), (4, 0)]
@@ -125,17 +119,31 @@ thales SceneVars {..} =
                         translate 4 0 $ mkCircle 0.5,
                         translate -4 0 $ mkCircle 0.5
                       ],
-                withFillOpacity 1 $ translate 4.2 0 $ textLabel2 "$ \\alpha \\beta $"
+                -- Endpoints
+                withFillOpacity 1 $
+                  mkGroup
+                    [ translate -4.0 0 $ mkCircle (endpointsDrawProgress * 0.05),
+                      translate 4.0 0 $ mkCircle (endpointsDrawProgress * 0.05),
+                      drawIf (endpointsDrawProgress > 0.99) $
+                        mkGroup
+                          [ translate -4.2 0 $ textLabel "A",
+                            translate 4.2 0 $ textLabel "B"
+                          ]
+                    ],
+                -- Center
+                withFillOpacity 1 $
+                  mkGroup
+                    [ mkCircle (centerDrawProgress * 0.05),
+                      drawIf (centerDrawProgress > 0.99) $
+                        translate 0 -0.4 $ textLabel "O"
+                    ]
               ]
 
 partial :: Double -> SVG -> Tree
 partial progress = partialSvg progress . pathify
 
 textLabel :: Text.Text -> Tree
-textLabel = scale 0.2 . mkText
-
-textLabel2 :: Text.Text -> Tree
-textLabel2 = scale 0.3 . latex
+textLabel = withFillColor "white" . scale 0.2 . mkText
 
 drawIf :: Bool -> SVG -> SVG
 drawIf cond svg = if cond then svg else None
@@ -149,12 +157,3 @@ data SceneVars = SceneVars
     endpointsDrawProgress :: Double,
     cTheta :: Double
   }
-
-{- TRANSCRIPT
-
-Let's draw a circle.
-A circle is a shape consisting of all points in a plane that are a given distance from a given point, the centre;
-
-A diameter of a circle is any straight line segment that passes through the center of the circle and whose endpoints lie on the circle.
-
--}

@@ -8,7 +8,9 @@ In geometry, Thale's theorem states that if A, B and C are distinct points on a 
 
 [step-by-step]
 
-Let's go through the statement step by step to get a better understanding of what it says.
+Let's take a moment to understand the concepts involved.
+
+circle - diameter - right angle
 
 TODO definition of a circle
 

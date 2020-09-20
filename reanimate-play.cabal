@@ -17,6 +17,7 @@ executable reanimate-play
     default-language: Haskell2010
     build-depends:
         base >=4.7 && <5,
+        mtl,
         reanimate ^>= 1.0.0.0,
         reanimate-svg,
         text,

@@ -1,71 +1,110 @@
 #!/usr/bin/env stack
 -- stack runghc --package reanimate
 
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NegativeLiterals #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module Main (main) where
 
-import Control.Applicative
-import Control.Lens (set, (&), (.~))
-import qualified Data.Text as Text
-import Graphics.SvgTree (LineJoin (JoinBevel), strokeLineJoin)
-import Graphics.SvgTree.Types (fontFamily)
-import Linear.V2
+import Control.Lens --(set, (&), (.~))
+import Control.Monad
+import Linear
 import Reanimate
-import Reanimate.Builtin.Documentation
-import Reanimate.Math.Common (distance')
-import Reanimate.Transition
+import Reanimate.Scene
 
 main :: IO ()
 main =
-  reanimate $
-    addStatic (mkBackground "white") $
-      scene $ do
-        triangleDrawProgress <- newVar 0
-        circleDrawProgress <- newVar 0
-        xLeg <- newVar 1
-        yLeg <- newVar 1
-        newSprite_ $
-          fmap triangle $
-            SceneVars
-              <$> unVar triangleDrawProgress
-                <*> unVar circleDrawProgress
-                <*> unVar xLeg
-                <*> unVar yLeg
-        tweenVar triangleDrawProgress 2 $ \val -> fromToS val 1
-        wait 1
-        tweenVar circleDrawProgress 2 $ \val -> fromToS val 1
-        wait 1
-        tweenVar xLeg 1 $ \val -> fromToS val 4
-        wait 1
-        tweenVar yLeg 1 $ \val -> fromToS val 4
-        wait 1
-        tweenVar xLeg 1 $ \val -> fromToS val 1
-        wait 1
-        tweenVar yLeg 1 $ \val -> fromToS val 1
-        wait 1
+  reanimate animation
 
-triangle :: SceneVars -> SVG
-triangle SceneVars {..} =
-    withStrokeColor "black" $
-      withFillOpacity 0 $
-        withStrokeWidth (defaultStrokeWidth * 0.4) $
-          mkGroup
-            [ translate (y / 2) (x / 2) $
-                partialSvg circleDrawProgress $
-                  pathify $ mkCircle ((distance' (V2 0 x) (V2 y 0)) / 2),
-              partialSvg triangleDrawProgress $
-                pathify $
-                  mkLinePath [(0, 0), (0, x), (y, 0), (0, 0)]
-                    & strokeLineJoin .~ pure JoinBevel,
-              translate (y / 2) (x / 2) $ mkCircle 0.03
-            ]
+animation :: Animation
+animation = env $
+  scene $ do
+    symbols <-
+      mapM
+        oNew
+        [symb_e, symb_eq, symb_m, symb_c2]
+    mapM_ oShow symbols
+    wait 1
 
-data SceneVars = SceneVars
-  { triangleDrawProgress :: Double, -- 0-1
-    circleDrawProgress :: Double, -- 0-1
-    cAngle :: Double,
-    
-  }
+    forM_ (zip symbols yPositions) $
+      \(obj, yPos) -> do
+        fork $
+          oTweenS obj 1 $ \t -> do
+            oScale %= \origin -> fromToS origin scaleFactor t
+            oLeftX %= \origin -> fromToS origin screenLeft t
+            oCenterY %= \origin -> fromToS origin yPos t
+        wait 0.3
+
+    wait 1
+
+    ls <- mapM oNew [energy, equals, mass, speedOfLight]
+
+    forM_ (zip ls yPositions) $
+      \(obj, nth) -> do
+        oModifyS obj $ do
+          oLeftX .= -4
+          oCenterY .= nth
+        oShowWith obj oDraw
+
+    wait 2
+
+    forM_ ls $ \obj ->
+      fork $ oHideWith obj oFadeOut
+
+    forM_ (reverse symbols) $ \obj -> do
+      fork $
+        oTweenS obj 1 $ \t -> do
+          oScale %= \origin -> fromToS origin 1 t
+          oTranslate %= lerp t (V2 0 0)
+      wait 0.3
+    wait 2
+
+scaleFactor = 0.7
+
+symb_e :: SVG
+symb_e = snd $ splitGlyphs [0] svg
+
+symb_eq :: SVG
+symb_eq = snd $ splitGlyphs [1] svg
+
+symb_m :: SVG
+symb_m = snd $ splitGlyphs [2] svg
+
+symb_c2 :: SVG
+symb_c2 = snd $ splitGlyphs [3, 4] svg
+
+svg =
+  scale 3 $
+    center $
+      latexAlign "E = mc^2"
+
+energy =
+  scale 1.5 $
+    centerX $
+      latex "Energy"
+
+equals =
+  scale 1.5 $
+    centerX $
+      latex "equals"
+
+mass =
+  scale 1.5 $
+    centerX $
+      latex "mass times"
+
+speedOfLight =
+  scale 1.5 $
+    centerX $
+      latex "speed of light$^2$"
+
+yPositions = [3, 1, -1, -3]
+
+env :: Animation -> Animation
+env =
+  addStatic (mkBackground "lightblue")
+    . mapA (withStrokeWidth defaultStrokeWidth)
+    . mapA (withStrokeColor "black")
