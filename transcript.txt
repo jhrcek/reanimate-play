@@ -1,20 +1,5 @@
 [title]
 
-Thales's Theorem
-
 [statement]
 
-In geometry, Thale's theorem states that if A, B and C are distinct points on a circle, where the line AC is a diameter, then the angle <ABC is a right angle.
-
-[step-by-step]
-
-Let's take a moment to understand the concepts involved.
-
-circle - diameter - right angle
-
-TODO definition of a circle
-
-TODO definition of a diameter
-
-[proof]
-
+In geometry, Thale's theorem states that if A, B and C are distinct points on a circle, where the line AC is a diameter, then the angle ABC is a right angle.

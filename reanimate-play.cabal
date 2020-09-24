@@ -23,4 +23,5 @@ executable reanimate-play
         text,
         lens,
         linear,
-        JuicyPixels
+        JuicyPixels,
+        random
