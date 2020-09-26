@@ -3,16 +3,13 @@
 
 {-# LANGUAGE NegativeLiterals #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS_GHC -Wall #-}
 
 module Main (main) where
 
---import Reanimate.Scene
 import Control.Lens ((&), (.~))
-import qualified Data.Text as Text
+import Data.Text (Text)
 import Graphics.SvgTree (ElementRef (Ref), LineJoin (JoinBevel), strokeLineJoin)
-import Linear.V2
 import Reanimate
 
 main :: IO ()
@@ -27,18 +24,15 @@ thales alpha =
       pointOnCircle theta = (4 * cos theta, 4 * sin theta)
       a = pointOnCircle pi
       b = pointOnCircle 0
-      c = pointOnCircle (2*pi*alpha)-- (pi / 8 + (6 * alpha * pi / 8))
+      c = pointOnCircle (pi / 8 + (6 * alpha * pi / 8))
+      origin = (0, 0)
       triangleVertices = [b, c, a]
       dot = withFillOpacity 1 $ withFillColor "white" $ mkCircle 0.06
       angleLabel x y z txt =
-        let avgAngle = averageAngle x y z
-         in latex txt
-              & center
-              & scale 0.5
-              & withFillColor "white"
-              & withFillOpacity 1
+        let bisectAngle = bisectorAngle x y z
+         in textLabel txt
               & uncurry translate y
-              & translate (cos avgAngle) (sin avgAngle)
+              & translate (cos bisectAngle) (sin bisectAngle)
    in withStrokeColor "white" $
         withFillOpacity 0 $
           withStrokeWidth (0.5 * defaultStrokeWidth) $
@@ -55,7 +49,7 @@ thales alpha =
                   triangleVertices
                   & strokeLineJoin .~ pure JoinBevel,
                 mkGroup [translate x y dot | (x, y) <- triangleVertices],
-                -- mkLine (0, 0) c,
+                mkLine (0, 0) c,
                 -- Angles
                 withClipPathRef (Ref "triangle-mask") $
                   mkGroup [translate x y (mkCircle 0.7) | (x, y) <- triangleVertices],
@@ -63,22 +57,29 @@ thales alpha =
                 mkGroup $
                   zipWith
                     ( \(x, y) text ->
-                        mkText text
-                          & withFillOpacity 1
-                          & withFillColor "white"
-                          & scale 0.2
+                        textLabel text
                           & translate (1.1 * x) (1.1 * y)
                     )
                     triangleVertices
                     ["B", "C", "A"],
-                angleLabel c a b "$\\alpha$",
-                angleLabel a b c "$\\beta$",
-                angleLabel a c b "$\\gamma$"
+                angleLabel b a c "$\\alpha$",
+                angleLabel a c origin "$\\alpha$",
+                angleLabel origin c b "$\\beta$",
+                angleLabel c b a "$\\beta$"
               ]
 
--- | Given angle <ABC find the direction of the angle bisector in radians
-averageAngle :: (Double, Double) -> (Double, Double) -> (Double, Double) -> Double
-averageAngle (ax, ay) (bx, by) (cx, cy) =
+-- | Given three points A, B and C, find the direction of
+-- the angle bisector of <ABC in radians
+bisectorAngle :: (Double, Double) -> (Double, Double) -> (Double, Double) -> Double
+bisectorAngle (ax, ay) (bx, by) (cx, cy) =
   let baAngle = atan2 (ay - by) (ax - bx)
       bcAngle = atan2 (cy - by) (cx - bx)
    in (baAngle + bcAngle) / 2
+
+textLabel :: Text -> SVG
+textLabel text =
+  latex text
+    & center
+    & scale 0.4
+    & withFillColor "white"
+    & withFillOpacity 1
