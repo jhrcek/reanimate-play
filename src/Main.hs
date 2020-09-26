@@ -8,56 +8,77 @@
 
 module Main (main) where
 
---(LineJoin (JoinBevel), strokeLineJoin, pattern None)
-
-import Control.Monad (forM_)
-import Data.List
-import Graphics.SvgTree
+--import Reanimate.Scene
+import Control.Lens ((&), (.~))
+import qualified Data.Text as Text
+import Graphics.SvgTree (ElementRef (Ref), LineJoin (JoinBevel), strokeLineJoin)
+import Linear.V2
 import Reanimate
-import System.Random
-
-triples :: Ord a => [a] -> [(a, a, a)]
-triples (x : y : z : rest) = (x, y, z) : triples rest
 
 main :: IO ()
-main = do
-  randomTriples <- take 10 . triples . randomRs (0, 2 * pi) <$> newStdGen
+main = reanimate $ addStatic (mkBackground "black") animation
 
-  reanimate $
-    addStatic (mkBackground "black") $
-      scene $ do
-        alpha <- newVar 0
-        beta <- newVar 0
-        gamma <- newVar 0
-        newSprite_ $ view <$> unVar alpha <*> unVar beta <*> unVar gamma
+animation :: Animation
+animation = mkAnimation 5 (thales . bellS 2)
 
-        forM_ randomTriples $ \(a, b, c) -> do
-          tweenVar alpha 1 $ \val -> fromToS val a
-          fork $ tweenVar beta 1 $ \val -> fromToS val b
-          fork $ tweenVar gamma 1 $ \val -> fromToS val c
-          wait 0.5
-
-view :: Double -> Double -> Double -> SVG
-view alpha beta gamma =
-  let r = 4.0
+thales :: Time -> SVG
+thales alpha =
+  let r = 4
+      pointOnCircle theta = (4 * cos theta, 4 * sin theta)
+      a = pointOnCircle pi
+      b = pointOnCircle 0
+      c = pointOnCircle (2*pi*alpha)-- (pi / 8 + (6 * alpha * pi / 8))
+      triangleVertices = [b, c, a]
+      dot = withFillOpacity 1 $ withFillColor "white" $ mkCircle 0.06
+      angleLabel x y z txt =
+        let avgAngle = averageAngle x y z
+         in latex txt
+              & center
+              & scale 0.5
+              & withFillColor "white"
+              & withFillOpacity 1
+              & uncurry translate y
+              & translate (cos avgAngle) (sin avgAngle)
    in withStrokeColor "white" $
         withFillOpacity 0 $
-          withStrokeWidth (defaultStrokeWidth * 0.4) $
+          withStrokeWidth (0.5 * defaultStrokeWidth) $
             mkGroup
-              [ mkCircle r,
-                mkLinePath
-                  [ anglePoint r alpha,
-                    anglePoint r beta,
-                    anglePoint r gamma,
-                    anglePoint r alpha
-                  ]
+              [ mkClipPath
+                  "triangle-mask"
+                  [mkLinePathClosed triangleVertices],
+                -- The big circle
+                mkCircle r,
+                -- Center
+                dot,
+                -- Triangle
+                mkLinePathClosed
+                  triangleVertices
+                  & strokeLineJoin .~ pure JoinBevel,
+                mkGroup [translate x y dot | (x, y) <- triangleVertices],
+                -- mkLine (0, 0) c,
+                -- Angles
+                withClipPathRef (Ref "triangle-mask") $
+                  mkGroup [translate x y (mkCircle 0.7) | (x, y) <- triangleVertices],
+                -- vertex labels
+                mkGroup $
+                  zipWith
+                    ( \(x, y) text ->
+                        mkText text
+                          & withFillOpacity 1
+                          & withFillColor "white"
+                          & scale 0.2
+                          & translate (1.1 * x) (1.1 * y)
+                    )
+                    triangleVertices
+                    ["B", "C", "A"],
+                angleLabel c a b "$\\alpha$",
+                angleLabel a b c "$\\beta$",
+                angleLabel a c b "$\\gamma$"
               ]
 
-anglePoint :: Double -> Double -> (Double, Double)
-anglePoint radius angle =
-  ( radius * cos angle,
-    radius * sin angle
-  )
-
-drawIf :: Bool -> SVG -> SVG
-drawIf cond svg = if cond then svg else None
+-- | Given angle <ABC find the direction of the angle bisector in radians
+averageAngle :: (Double, Double) -> (Double, Double) -> (Double, Double) -> Double
+averageAngle (ax, ay) (bx, by) (cx, cy) =
+  let baAngle = atan2 (ay - by) (ax - bx)
+      bcAngle = atan2 (cy - by) (cx - bx)
+   in (baAngle + bcAngle) / 2
