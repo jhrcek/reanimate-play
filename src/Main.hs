@@ -7,65 +7,85 @@
 
 module Main (main) where
 
+import Codec.Picture (PixelRGBA8 (..))
 import Control.Lens ((&), (.~))
 import Data.Text (Text)
 import Graphics.SvgTree (ElementRef (Ref), LineJoin (JoinBevel), strokeLineJoin)
 import Reanimate
 
 main :: IO ()
-main = reanimate $ addStatic (mkBackground "black") animation
+main =
+  reanimate $
+    addStatic (mkBackground "black") animation
 
 animation :: Animation
-animation = mkAnimation 5 (thales . bellS 2)
+animation =
+  staticFrame 0.02 thales
 
-thales :: Time -> SVG
-thales alpha =
-  let r = 4
-      pointOnCircle theta = (4 * cos theta, 4 * sin theta)
-      a = pointOnCircle pi
-      b = pointOnCircle 0
-      c = pointOnCircle (pi / 8 + (6 * alpha * pi / 8))
+thales :: SVG
+thales =
+  let radius = 4
+      theta = 2 * pi / 3
+      a = fromPolar radius pi
+      b = fromPolar radius 0
+      c = fromPolar radius theta
       origin = (0, 0)
       triangleVertices = [b, c, a]
       dot = withFillOpacity 1 $ withFillColor "white" $ mkCircle 0.06
-      angleLabel x y z txt =
+      angleLabel x y z txt color =
         let bisectAngle = bisectorAngle x y z
-         in textLabel txt
+         in textLabel color txt
               & uncurry translate y
               & translate (cos bisectAngle) (sin bisectAngle)
    in withStrokeColor "white" $
         withFillOpacity 0 $
           withStrokeWidth (0.5 * defaultStrokeWidth) $
             mkGroup
-              [ mkClipPath
-                  "triangle-mask"
-                  [mkLinePathClosed triangleVertices],
+              [ mkClipPath "ACO" [mkLinePathClosed [a, c, origin]],
+                mkClipPath "BCO" [mkLinePathClosed [b, c, origin]],
                 -- The big circle
-                mkCircle r,
-                -- Center
-                dot,
+                mkCircle radius,
+                -- Alpha angles
+                withClipPathRef (Ref "ACO") $
+                  mkGroup
+                    [ mkCircle 0.7
+                        & translate x y
+                        & withFillColorPixel green
+                        & withFillOpacity 1
+                        & withStrokeWidth 0
+                      | (x, y) <- [a, c]
+                    ],
+                -- Beta angles
+                withClipPathRef (Ref "BCO") $
+                  mkGroup
+                    [ mkCircle 0.7
+                        & translate x y
+                        & withFillColorPixel red
+                        & withFillOpacity 1
+                        & withStrokeWidth 0
+                      | (x, y) <- [b, c]
+                    ],
                 -- Triangle
-                mkLinePathClosed
-                  triangleVertices
+                mkLinePathClosed triangleVertices
                   & strokeLineJoin .~ pure JoinBevel,
                 mkGroup [translate x y dot | (x, y) <- triangleVertices],
+                -- Center
+                dot,
+                textLabel white "O" & translate 0 -0.4,
                 mkLine (0, 0) c,
-                -- Angles
-                withClipPathRef (Ref "triangle-mask") $
-                  mkGroup [translate x y (mkCircle 0.7) | (x, y) <- triangleVertices],
                 -- vertex labels
                 mkGroup $
                   zipWith
                     ( \(x, y) text ->
-                        textLabel text
+                        textLabel white text
                           & translate (1.1 * x) (1.1 * y)
                     )
                     triangleVertices
                     ["B", "C", "A"],
-                angleLabel b a c "$\\alpha$",
-                angleLabel a c origin "$\\alpha$",
-                angleLabel origin c b "$\\beta$",
-                angleLabel c b a "$\\beta$"
+                angleLabel origin a c "$\\alpha$" green,
+                angleLabel origin c a "$\\alpha$" green,
+                angleLabel origin c b "$\\beta$" red,
+                angleLabel origin b c "$\\beta$" red
               ]
 
 -- | Given three points A, B and C, find the direction of
@@ -76,10 +96,20 @@ bisectorAngle (ax, ay) (bx, by) (cx, cy) =
       bcAngle = atan2 (cy - by) (cx - bx)
    in (baAngle + bcAngle) / 2
 
-textLabel :: Text -> SVG
-textLabel text =
+textLabel :: PixelRGBA8 -> Text -> SVG
+textLabel color text =
   latex text
     & center
     & scale 0.4
-    & withFillColor "white"
+    & withFillColorPixel color
     & withFillOpacity 1
+
+red, green, white :: PixelRGBA8
+red = PixelRGBA8 255 0 0 0
+green = PixelRGBA8 0 255 0 0
+white = PixelRGBA8 255 255 255 0
+
+-- | Given polar coordinates (radius and angle in radians) return  cartesian (x,y) coordinates of the point
+fromPolar :: Double -> Double -> (Double, Double)
+fromPolar radius theta =
+  (radius * cos theta, radius * sin theta)
