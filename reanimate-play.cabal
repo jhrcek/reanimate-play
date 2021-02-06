@@ -12,16 +12,22 @@ build-type:         Simple
 extra-source-files: README.md
 
 executable reanimate-play
-    main-is:          Main.hs
-    hs-source-dirs:   src
-    default-language: Haskell2010
-    build-depends:
-        base >=4.7 && <5,
-        mtl,
-        reanimate ^>= 1.0.0.0,
-        reanimate-svg,
-        text,
-        lens,
-        linear,
-        JuicyPixels,
-        random
+  main-is:          Main.hs
+  other-modules:
+    ThalesTry1
+    ThalesTry2
+    ThalesTry3
+
+  hs-source-dirs:   src
+  default-language: Haskell2010
+  ghc-options:      -Wall
+  build-depends:
+    , base           >=4.7 && <5
+    , JuicyPixels
+    , lens
+    , linear
+    , mtl
+    , random
+    , reanimate
+    , reanimate-svg
+    , text
