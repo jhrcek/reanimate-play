@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module ThalesTry1 (main) where
+module ThalesTry1 (animation) where
 
 import Control.Lens
 import Control.Monad
@@ -9,18 +9,13 @@ import Reanimate
 import Reanimate.Scene
 
 
-main :: IO ()
-main =
-    reanimate animation
-
-
 animation :: Animation
 animation = env $
     scene $ do
         symbols <-
             mapM
                 oNew
-                [symb_e, symb_eq, symb_m, symb_c2]
+                [symbE, symbEq, symbM, symbC2]
         mapM_ oShow symbols
         wait 1
 
@@ -62,20 +57,20 @@ scaleFactor :: Double
 scaleFactor = 0.7
 
 
-symb_e :: SVG
-symb_e = snd $ splitGlyphs [0] svg
+symbE :: SVG
+symbE = snd $ splitGlyphs [0] svg
 
 
-symb_eq :: SVG
-symb_eq = snd $ splitGlyphs [1] svg
+symbEq :: SVG
+symbEq = snd $ splitGlyphs [1] svg
 
 
-symb_m :: SVG
-symb_m = snd $ splitGlyphs [2] svg
+symbM :: SVG
+symbM = snd $ splitGlyphs [2] svg
 
 
-symb_c2 :: SVG
-symb_c2 = snd $ splitGlyphs [3, 4] svg
+symbC2 :: SVG
+symbC2 = snd $ splitGlyphs [3, 4] svg
 
 
 svg :: SVG

@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
 
-module ThalesTry2 (main) where
+module ThalesTry2 (animation) where
 
 import Control.Lens ((&), (.~))
 import qualified Data.Text as Text
@@ -23,55 +23,54 @@ ts0 :: Transcript
 ts0 = loadTranscript "/home/jhrcek/Devel/github.com/jhrcek/reanimate-play/transcript.txt"
 
 
-main :: IO ()
-main = do
-    reanimate $
-        addStatic (mkBackground "black") $
-            scene $ do
-                titleDuration <- withSceneDuration titleScene
-                let ts = postponeTranscript titleDuration ts0
-                fork $ annotateWithTranscript ts
+animation :: Animation
+animation =
+    addStatic (mkBackground "black") $
+        scene $ do
+            titleDuration <- withSceneDuration titleScene
+            let ts = postponeTranscript titleDuration ts0
+            fork $ annotateWithTranscript ts
 
-                aP <- newVar 0
-                bP <- newVar 0
-                cP <- newVar 0
-                circleP <- newVar 0
-                diameterP <- newVar 0
-                triangleP <- newVar 0
-                cTheta <- newVar $ 2 * pi / 3
+            aP <- newVar 0
+            bP <- newVar 0
+            cP <- newVar 0
+            circleP <- newVar 0
+            diameterP <- newVar 0
+            triangleP <- newVar 0
+            cTheta <- newVar $ 2 * pi / 3
 
-                newSprite_ $
-                    fmap thales $
-                        SceneVars
-                            <$> unVar aP
-                            <*> unVar bP
-                            <*> unVar cP
-                            <*> unVar circleP
-                            <*> unVar diameterP
-                            <*> unVar triangleP
-                            <*> unVar cTheta
+            newSprite_ $
+                fmap thales $
+                    SceneVars
+                        <$> unVar aP
+                        <*> unVar bP
+                        <*> unVar cP
+                        <*> unVar circleP
+                        <*> unVar diameterP
+                        <*> unVar triangleP
+                        <*> unVar cTheta
 
-                waitUntil $ wordStart $ findWord ts ["statement"] "geometry"
-                tweenVar circleP 2 $ \val -> fromToS val 1
+            waitUntil $ wordStart $ findWord ts ["statement"] "geometry"
+            tweenVar circleP 2 $ \val -> fromToS val 1
 
-                waitUntil $ wordStart $ findWord ts ["statement"] "A"
-                fork $ do
-                    tweenVar aP 0.5 $ \val -> fromToS val 2
-                    tweenVar aP 0.5 $ \val -> fromToS val 1
-                waitUntil $ wordStart $ findWord ts ["statement"] "B"
-                fork $ do
-                    tweenVar bP 0.5 $ \val -> fromToS val 2
-                    tweenVar bP 0.5 $ \val -> fromToS val 1
-                waitUntil $ wordStart $ findWord ts ["statement"] "C"
-                fork $ do
-                    tweenVar cP 0.5 $ \val -> fromToS val 2
-                    tweenVar cP 0.5 $ \val -> fromToS val 1
+            waitUntil $ wordStart $ findWord ts ["statement"] "A"
+            fork $ do
+                tweenVar aP 0.5 $ \val -> fromToS val 2
+                tweenVar aP 0.5 $ \val -> fromToS val 1
+            waitUntil $ wordStart $ findWord ts ["statement"] "B"
+            fork $ do
+                tweenVar bP 0.5 $ \val -> fromToS val 2
+                tweenVar bP 0.5 $ \val -> fromToS val 1
+            waitUntil $ wordStart $ findWord ts ["statement"] "C"
+            fork $ do
+                tweenVar cP 0.5 $ \val -> fromToS val 2
+                tweenVar cP 0.5 $ \val -> fromToS val 1
 
-                waitUntil $ wordStart $ findWord ts ["statement"] "AC"
-                tweenVar diameterP 1 $ \val -> fromToS val 1
+            waitUntil $ wordStart $ findWord ts ["statement"] "AC"
+            tweenVar diameterP 1 $ \val -> fromToS val 1
 
-                waitUntil $ wordStart $ findWord ts ["statement"] "then"
-                tweenVar triangleP 0.5 $ \val -> fromToS val 1
+            waitUntil $ wordStart $ findWord ts ["statement"] "then"
+            tweenVar triangleP 0.5 $ \val -> fromToS val 1
 
 
 titleScene :: Scene s ()

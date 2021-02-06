@@ -1,7 +1,7 @@
 {-# LANGUAGE NegativeLiterals #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main (main) where
+module Main (main, animation) where
 
 import Codec.Picture (PixelRGBA8 (..))
 import Control.Lens ((&), (.~))
@@ -12,13 +12,13 @@ import Reanimate
 
 main :: IO ()
 main =
-    reanimate $
-        addStatic (mkBackground "black") animation
+    reanimate animation
 
 
 animation :: Animation
 animation =
-    staticFrame 0.02 thales
+    addStatic (mkBackground "black") $
+        staticFrame 0.02 thales
 
 
 thales :: SVG
