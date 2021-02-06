@@ -11,8 +11,7 @@ import Reanimate
 
 
 main :: IO ()
-main =
-    reanimate animation
+main = reanimate animation
 
 
 animation :: Animation
