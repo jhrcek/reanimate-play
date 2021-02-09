@@ -1,7 +1,7 @@
 {-# LANGUAGE NegativeLiterals #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main (main, animation) where
+module Main (main) where
 
 import Codec.Picture (PixelRGBA8 (..))
 import Control.Lens ((&), (.~))

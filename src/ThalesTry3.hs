@@ -1,4 +1,4 @@
-module ThalesTry3 (main) where
+module ThalesTry3 (runAnimation) where
 
 import Control.Monad (forM_)
 import Reanimate
@@ -10,8 +10,8 @@ triples (x : y : z : rest) = (x, y, z) : triples rest
 triples _ = []
 
 
-main :: IO ()
-main = do
+runAnimation :: IO ()
+runAnimation = do
     randomTriples <- take 10 . triples . randomRs (0, 2 * pi) <$> newStdGen
 
     reanimate $

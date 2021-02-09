@@ -3,10 +3,21 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    name: reanimate
+    version: 1.1.3.2
+    git: https://github.com/reanimate/reanimate.git
+    pantry-tree:
+      size: 43038
+      sha256: 3630b902082de8504c75ca5e5dd9d8a820e436bba2adbb48b778b877c9e7b092
+    commit: f4878053b1433487d6a2aeebfebd8e171732a155
+  original:
+    git: https://github.com/reanimate/reanimate.git
+    commit: f4878053b1433487d6a2aeebfebd8e171732a155
 snapshots:
 - completed:
-    size: 563098
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/1.yaml
-    sha256: 395775c03e66a4286f134d50346b0b6f1432131cf542886252984b4cfa5fef69
-  original: lts-17.1
+    size: 563099
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/2.yaml
+    sha256: 92b1a17e31d0a978fca4bf270305d4d1dd8092271bf60eafbc9349c890854026
+  original: lts-17.2
