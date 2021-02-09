@@ -23,6 +23,7 @@ library
     ThalesTry1
     ThalesTry2
     ThalesTry3
+    ThalesTry4
 
   hs-source-dirs:   src
   default-language: Haskell2010
@@ -34,6 +35,7 @@ library
 
   build-depends:
     , base           >=4.7 && <5
+    , JuicyPixels
     , lens
     , linear
     , random

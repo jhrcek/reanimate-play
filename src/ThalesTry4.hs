@@ -1,17 +1,13 @@
 {-# LANGUAGE NegativeLiterals #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Main (main) where
+module ThalesTry4 (animation) where
 
 import Codec.Picture (PixelRGBA8 (..))
 import Control.Lens ((&), (.~))
 import Data.Text (Text)
 import Graphics.SvgTree (ElementRef (Ref), LineJoin (JoinBevel), strokeLineJoin)
 import Reanimate
-
-
-main :: IO ()
-main = reanimate animation
 
 
 animation :: Animation
