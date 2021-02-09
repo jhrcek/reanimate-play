@@ -1,5 +1,6 @@
 module Signals (animation) where
 
+import Data.Function ((&))
 import Reanimate
 
 
@@ -42,6 +43,10 @@ signalExample sig t =
         [ mkLinePath [(0, 1), (0, 0), (1, 0)]
         , mkLinePath [(x, sig x) | x <- [0, 0.02 .. 1]]
         , mkLinePath [(t, 0), (t, sig t), (0, sig t)]
+        , mkCircle 0.03
+            & translate 0 (sig t)
+            & withFillColor "black"
+            & withFillOpacity 1
         ]
 
 
