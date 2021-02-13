@@ -18,6 +18,7 @@ source-repository head
 library
   exposed-modules:
     AmiciLogo
+    Arrows
     BoolTable
     Cayley
     Signals
