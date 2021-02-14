@@ -18,29 +18,25 @@ animation =
             newSprite_ $ view <$> unVar squareRot <*> unVar circleScale <*> unVar squareFillOpacity <*> unVar descr
 
             writeVar descr "Rotate square"
-            spause 0.5
+            wait 0.5
             tweenVar squareRot 1 $ \val -> fromToS val 360
 
             writeVar descr "Enlarge circle"
-            spause 0.5
+            wait 0.5
             tweenVar circleScale 1 $ \val -> fromToS val 2
 
             writeVar descr "Redden square"
-            spause 0.5
+            wait 0.5
             tweenVar squareFillOpacity 1 $ \val -> fromToS val 1
 
             writeVar descr "Shrink circle"
-            spause 0.5
+            wait 0.5
             tweenVar circleScale 1 $ \val -> fromToS val 1
 
             writeVar descr "Rotate and blacken square"
-            spause 0.5
+            wait 0.5
             fork $ tweenVar squareFillOpacity 1 $ \val -> fromToS val 0
             tweenVar squareRot 1 $ \val -> fromToS val 720
-
-
-spause :: Duration -> Scene s ()
-spause = play . pause
 
 
 view :: Double -> Double -> Double -> Text -> SVG
@@ -62,6 +58,7 @@ view squareRot circleScale squareOpacity descr =
                 ]
             ]
   where
-    t = withFillColor "white" . scale 0.4 . mkText
+    t = withFillColor "white" . scale 0.3 . mkText
+
     showDouble :: Double -> Text
     showDouble = pack . printf "%.2f"
