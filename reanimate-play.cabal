@@ -21,6 +21,7 @@ library
     Arrows
     BoolTable
     Cayley
+    CircleMakeSpace
     SceneVars
     Signals
     ThalesTry1
