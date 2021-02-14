@@ -52,9 +52,7 @@ generateRandomCoords n = go n (0, 0)
 
 
 consecutiveParis :: [a] -> [(a, a)]
-consecutiveParis [] = []
-consecutiveParis [_] = []
-consecutiveParis (x : y : ys) = (x, y) : consecutiveParis (y : ys)
+consecutiveParis xs = zip xs (tail xs)
 
 
 pickElement :: [a] -> IO a

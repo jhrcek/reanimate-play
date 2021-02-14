@@ -21,6 +21,7 @@ library
     Arrows
     BoolTable
     Cayley
+    SceneVars
     Signals
     ThalesTry1
     ThalesTry2
