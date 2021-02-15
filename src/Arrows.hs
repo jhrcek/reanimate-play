@@ -17,7 +17,7 @@ main = do
     reanimate $ anim coords
 
 
-anim :: [((Double, Double), (Double, Double))] -> Animation
+anim :: [(V2 Double, V2 Double)] -> Animation
 anim coords =
     addStatic (mkBackground "black") $
         scene $
@@ -31,24 +31,22 @@ anim coords =
 
 
 -- | Sequence of coordinates starting from (0,0) and then going not far in random direction
-generateRandomCoords :: Int -> IO [(Double, Double)]
-generateRandomCoords n = go n (0, 0)
+generateRandomCoords :: Int -> IO [V2 Double]
+generateRandomCoords n = go n (pure 0)
   where
-    go m (x, y)
+    go m p
         | m <= 0 = pure []
         | otherwise = do
             let candidates =
-                    [ (x1, y1)
-                    | dx <- [-1 .. 1]
-                    , let x1 = x + dx
-                    , -8 <= x1 && x1 <= 8
-                    , dy <- [-1 .. 1]
-                    , let y1 = y + dy
-                    , -4 <= y1 && y1 <= 4
-                    , not (x == x1 && y == y1)
+                    [ q
+                    | d <- sequence (pure [-1, 0, 1])
+                    , d /= pure 0
+                    , let q@(V2 x y) = p + d
+                    , abs x <= screenRight
+                    , abs y <= screenTop
                     ]
             nxt <- pickElement candidates
-            ((x, y) :) <$> go (m - 1) nxt
+            (p :) <$> go (m - 1) nxt
 
 
 consecutiveParis :: [a] -> [(a, a)]
@@ -59,7 +57,7 @@ pickElement :: [a] -> IO a
 pickElement xs = (xs !!) <$> randomRIO (0, length xs - 1)
 
 
-myScene :: (Double, Double) -> (Double, Double) -> Tree
+myScene :: V2 Double -> V2 Double -> Tree
 myScene from to =
     withFillColor "red" $
         withStrokeColor "red" $
@@ -67,7 +65,7 @@ myScene from to =
                 mkGroup
                     [ mkDefinitions [arrowHeadMarker]
                     , grid
-                    , mkGroup [arrow from to]
+                    , arrow from to
                     ]
 
 
@@ -86,15 +84,10 @@ gridCoords =
     ]
 
 
-arrow :: (Double, Double) -> (Double, Double) -> SVG
-arrow (fromX, fromY) (toX, toY) =
-    let theta = atan2 (fromY - toY) (fromX - toX)
-     in mkLine
-            (fromX, fromY)
-            ( toX + 0.15 * cos theta
-            , toY + 0.15 * sin theta
-            )
-            & markerEnd .~ pure (Ref "arrow")
+arrow :: V2 Double -> V2 Double -> SVG
+arrow (V2 fromX fromY) (V2 toX toY) =
+    mkLine (fromX, fromY) (toX, toY)
+        & markerEnd .~ pure (Ref "arrow")
 
 
 arrowHeadMarker :: SVG
@@ -106,7 +99,8 @@ arrowHeadMarker =
             & markerWidth ?~ Num 8
             & markerHeight ?~ Num 8
             & markerOrient ?~ OrientationAuto
-            & markerRefPoint .~ (Num 0, Num halfWidth)
+            -- This moves the arrow back so that it's tip coincides with the end of line which it marks
+            & markerRefPoint .~ (Num len, Num halfWidth)
             & markerElements
                 .~ [ mkPath
                         [ MoveTo OriginAbsolute [V2 0 0]
