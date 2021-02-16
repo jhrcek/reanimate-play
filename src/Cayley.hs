@@ -28,12 +28,13 @@ anim =
 docEnv2 :: Animation -> Animation
 docEnv2 = mapA $ \svg ->
     mkGroup
-        [ mkDefinitions [withFillOpacity 1 arrowHeadMarker]
+        [ mkDefinitions [arrowHeadMarker]
         , mkBackground "black"
         , mkGroup [svg]
         ]
         & withStrokeColor "white"
         & withFillColor "white"
+        & withFillOpacity 1
         & withStrokeWidth 0.02
 
 
@@ -46,12 +47,10 @@ squareToCircle t label =
             & rectHeight ?~ Num 1
             & rectCornerRadius . each .~ pure (Num (0.5 * t))
             & rectangleTree
-            & withFillOpacity 1
             & withFillColor "black"
         , mkText (pack $ show label)
             & scale 0.3
             & translate 0.5 0.35
-            & withFillOpacity 1
         ]
 
 
