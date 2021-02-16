@@ -1,11 +1,16 @@
 {-# LANGUAGE NegativeLiterals #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Arrows (main) where
+module Arrow (
+    main,
+    arrow,
+    arrowHeadMarker,
+) where
 
 import Control.Lens ((&), (.~), (?~))
 import Data.Foldable (for_)
 import Graphics.SvgTree
+
 import Linear.V2
 import Reanimate
 import System.Random
