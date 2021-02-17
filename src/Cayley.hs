@@ -3,10 +3,12 @@
 module Cayley (anim) where
 
 import Arrow (arrow, arrowHeadMarker)
-import Control.Lens
+import Control.Lens (Each (each), (&), (.~), (?~))
 import Data.Text (pack)
 import Graphics.SvgTree.Types
+import Linear.V1
 import Linear.V2
+import Linear.Vector (lerp)
 import Reanimate
 
 
@@ -17,11 +19,14 @@ anim =
             scene $ do
                 sqToCirc <- newVar 0
                 distProg <- newVar 0
-                newSprite_ $ gridToFunction <$> unVar sqToCirc <*> unVar distProg
+                codomainAlignProg <- newVar 0
+                newSprite_ $ gridToFunction <$> unVar sqToCirc <*> unVar distProg <*> unVar codomainAlignProg
                 wait 1
                 tweenVar sqToCirc 1 $ \val -> fromToS val 1
                 wait 1
                 tweenVar distProg 1 $ \val -> fromToS val 1 . curveS 2
+                wait 1
+                tweenVar codomainAlignProg 1 $ \val -> fromToS val 1 . curveS 2
                 wait 1
 
 
@@ -54,23 +59,34 @@ squareToCircle t label =
         ]
 
 
-gridToFunction :: Double -> Double -> Tree
-gridToFunction sqToCProg distProg =
-    mkGroup
-        [ -- arrows
-          translate domainX (2 * verticalSpread + 0.5) $ arrow (V2 domainX 0) (V2 codomainX 0)
-        , translate domainX (1 * verticalSpread + 0.5) $ arrow (V2 domainX 0) (V2 codomainX 0)
-        , translate domainX (0 * verticalSpread + 0.5) $ arrow (V2 domainX 0) (V2 codomainX 0)
-        , -- domain
-          translate domainX (2 * verticalSpread) $ squareToCircle sqToCProg 1
-        , translate domainX (1 * verticalSpread) $ squareToCircle sqToCProg 2
-        , translate domainX (0 * verticalSpread) $ squareToCircle sqToCProg 3
-        , -- codomain
-          translate codomainX (2 * verticalSpread) $ squareToCircle sqToCProg 2
-        , translate codomainX (1 * verticalSpread) $ squareToCircle sqToCProg 3
-        , translate codomainX (0 * verticalSpread) $ squareToCircle sqToCProg 1
-        ]
+gridToFunction :: Double -> Double -> Double -> Tree
+gridToFunction sqToCProg distProg codomainAlignProg =
+    mkGroup $ viewMapping <$> function
   where
     domainX = 0
     codomainX = domainX + 1 + 2 * distProg
     verticalSpread = 1 + distProg
+
+    -- TODO less error prone representation of function
+    function :: [(Double, Double)]
+    function = [(1, 2), (2, 3), (3, 1)]
+
+    domainSize :: Double
+    domainSize = fromIntegral $ length function
+
+    viewMapping :: (Double, Double) -> SVG
+    viewMapping (from, to) =
+        let domainY = (domainSize - from) * verticalSpread
+            V1 codomainY =
+                lerp -- linear interpolation
+                    codomainAlignProg
+                    (V1 $ (domainSize - to) * verticalSpread) -- finish
+                    (V1 domainY) -- start
+         in mkGroup
+                [ translate domainX 0.5 $
+                    arrow
+                        (V2 (domainX + 1) domainY)
+                        (V2 codomainX codomainY)
+                , translate domainX domainY $ squareToCircle sqToCProg (round from)
+                , translate codomainX codomainY $ squareToCircle sqToCProg (round to)
+                ]
