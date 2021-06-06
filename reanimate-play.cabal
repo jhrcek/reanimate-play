@@ -38,11 +38,11 @@ library
     -Wunused-packages
 
   build-depends:
-    , base           >=4.7 && <5
+    , base           >=4.7     && <5
     , JuicyPixels
     , lens
     , linear
     , random
-    , reanimate
+    , reanimate      >=1.1.3.3
     , reanimate-svg
     , text
